@@ -1,0 +1,112 @@
+[
+  {
+    "_id": 1,
+    "name": "Cargo Terminal 1",
+    "img": "https://media.istockphoto.com/id/504862904/photo/container-ship-in-the-harbor-in-asia.jpg?s=612x612&w=0&k=20&c=22ntYAlFmYlRVBBgw3sTiivV4Xx66SPEaa186sMlb-s=",
+    "slots": [
+      "08.00 AM - 08.30 AM",
+      "08.30 AM - 09.00 AM",
+      "09.00 AM - 9.30 AM",
+      "09.30 AM - 10.00 AM",
+      "10.00 AM - 10.30 AM",
+      "10.30 AM - 11.00 AM",
+      "11.00 AM - 11.30 AM",
+      "11.30 AM - 12.00 AM",
+      "6.00 PM - 7.30 PM",
+      "9.00 PM - 11.30 PM"
+    ]
+  },
+  {
+    "_id": 2,
+    "name": "Cargo Terminal 2",
+    "img": "https://www.presstelegram.com/wp-content/uploads/2023/02/LPT-L-POLB-TERMINAL-0210_35.jpg?w=1024",
+    "slots": [
+      "08.00 AM - 08.30 AM",
+      "08.30 AM - 09.00 AM",
+      "09.00 AM - 9.30 AM",
+      "09.30 AM - 10.00 AM",
+      "10.00 AM - 10.30 AM",
+      "10.30 AM - 11.00 AM",
+      "11.00 AM - 11.30 AM",
+      "11.30 AM - 12.00 AM",
+      "1.00 PM - 1.30 PM"
+    ]
+  },
+  {
+    "_id": 3,
+    "name": "Cargo Terminal 3",
+    "img": "https://us.123rf.com/450wm/miguelavv/miguelavv2110/miguelavv211000043/177141428-night-view-of-the-port-with-container-ships-shortage-of-merchandise-at-christmas.jpg?ver=6",
+    "slots": [
+      "08.00 AM - 08.30 AM",
+      "08.30 AM - 09.00 AM",
+      "09.00 AM - 9.30 AM",
+      "09.30 AM - 10.00 AM",
+      "10.00 AM - 10.30 AM",
+      "10.30 AM - 11.00 AM",
+      "11.00 AM - 11.30 AM",
+      "11.30 AM - 12.00 AM",
+      "1.00 PM - 1.30 PM",
+      "1.30 PM - 2.00 PM",
+      "2.00 PM - 2.30 PM",
+      "2.30 PM - 3.00 PM",
+      "3.00 PM - 3.30 PM",
+      "3.30 PM - 4.00 PM",
+      "4.00 PM - 4.30 PM",
+      "4.30 PM - 5.00 PM"
+    ]
+  },
+  {
+    "_id": 4,
+    "name": "Cargo Terminal 4",
+    "img": "https://news.microsoft.com/wp-content/uploads/prod/sites/436/2021/07/BERTH-SHOT_1280x718.jpg",
+    "slots": [
+      "08.00 AM - 08.30 AM",
+      "08.30 AM - 09.00 AM",
+      "09.00 AM - 9.30 AM",
+      "09.30 AM - 10.00 AM",
+      "10.00 AM - 10.30 AM",
+      "10.30 AM - 11.00 AM",
+      "2.00 PM - 2.30 PM",
+      "2.30 PM - 3.00 PM",
+      "3.00 PM - 3.30 PM",
+      "3.30 PM - 4.00 PM",
+      "4.00 PM - 4.30 PM",
+      "4.30 PM - 5.00 PM"
+    ]
+  },
+  {
+    "_id": 5,
+    "name": "Cargo Terminal 5",
+    "img": "",
+    "slots": [
+      "08.00 AM - 08.30 AM",
+      "08.30 AM - 09.00 AM",
+      "3.30 PM - 4.00 PM",
+      "4.00 PM - 4.30 PM",
+      "4.30 PM - 5.00 PM"
+    ]
+  },
+  {
+    "_id": 6,
+    "name": "Cargo Terminal 6",
+    "img": "",
+    "slots": [
+      "08.00 AM - 08.30 AM",
+      "08.30 AM - 09.00 AM",
+      "09.00 AM - 9.30 AM",
+      "09.30 AM - 10.00 AM",
+      "10.00 AM - 10.30 AM",
+      "10.30 AM - 11.00 AM",
+      "11.00 AM - 11.30 AM",
+      "11.30 AM - 12.00 AM",
+      "1.00 PM - 1.30 PM",
+      "1.30 PM - 2.00 PM",
+      "2.00 PM - 2.30 PM",
+      "2.30 PM - 3.00 PM",
+      "3.00 PM - 3.30 PM",
+      "3.30 PM - 4.00 PM",
+      "4.00 PM - 4.30 PM",
+      "4.30 PM - 5.00 PM"
+    ]
+  }
+]

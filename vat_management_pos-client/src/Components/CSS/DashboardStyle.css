@@ -1,0 +1,107 @@
+/* Custom scrollbar for sidebar */
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 3px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Email word wrapping styles */
+.word-wrap-email {
+  /* Force word breaking for long unbroken strings */
+  word-break: break-all;
+  /* Alternative: use break-word for better readability */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  
+  /* Ensure the text wraps properly */
+  white-space: normal;
+  line-height: 1.4;
+  
+  /* Add some spacing */
+  margin-top: 2px;
+}
+
+/* For better readability of long emails */
+.word-wrap-email {
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+}
+
+/* Smooth transitions */
+.nav-link {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Ensure proper spacing on mobile */
+@media (max-width: 1023px) {
+  .mobile-header {
+    height: 64px;
+  }
+  
+  .main-content {
+    padding-top: 64px;
+  }
+}
+
+/* Mobile sidebar animation */
+.mobile-sidebar-enter {
+  transform: translateX(-100%);
+}
+
+.mobile-sidebar-enter-active {
+  transform: translateX(0);
+  transition: transform 300ms ease-in-out;
+}
+
+.mobile-sidebar-exit {
+  transform: translateX(0);
+}
+
+.mobile-sidebar-exit-active {
+  transform: translateX(-100%);
+  transition: transform 300ms ease-in-out;
+}
+
+/* Alternative: Tooltip for emails on hover (optional) */
+.email-container {
+  position: relative;
+}
+
+.email-container:hover .email-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.email-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 10;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  word-break: break-all;
+  white-space: normal;
+  margin-top: 5px;
+}

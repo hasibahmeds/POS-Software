@@ -1,0 +1,45 @@
+.test {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  background-color: #e9b31e;
+}
+
+.textH1 {
+  position: relative;
+  font-size: 5vw;
+  font-weight: 800;
+  color:#e9b31e;
+  -webkit-text-stroke: 0.3vw #e9b31e;
+}
+
+.textH1::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  color:rgb(2, 2, 60);
+  -webkit-text-stroke: 0vw #383d52;
+  /* border-radius: 2px solid #01fe87; */
+  overflow: hidden;
+  animation: animate 6s linear infinite;
+}
+
+@keyframes animate {
+  0%,
+  10%,
+  50%,
+  70%,
+  90%,
+  100% {
+    width: 0;
+  }
+
+  50%,
+  70%,
+  90% {
+    width: 100%;
+  }
+}

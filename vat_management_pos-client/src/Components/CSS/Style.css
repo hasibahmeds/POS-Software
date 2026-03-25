@@ -1,0 +1,8 @@
+.backgroundImageSet {
+  background-image: url("https://thumbs.dreamstime.com/b/blue-watercolor-background-banner-frame-texture-splash-big-size-200161888.jpg");
+  height: 100%;
+
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
