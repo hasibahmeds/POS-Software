@@ -1,3 +1,4 @@
+//newly created file to manage associations between models in a single place
 // This file sets up all model associations
 // Import sequelize instance
 const sequelize = require('../config/db');
