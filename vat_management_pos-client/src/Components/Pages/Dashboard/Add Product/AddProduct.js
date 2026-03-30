@@ -223,7 +223,7 @@ const AddProduct = () => {
       // 2. Prepare the product object
       const productData = {
         name: data.name,
-        pId: data.pId,
+        productId: data.productId,
         quantity: data.quantity,
         price: data.price,
         img: finalImageUrl,
@@ -281,9 +281,9 @@ const AddProduct = () => {
                 type="text"
                 placeholder="Enter unique ID"
                 className="input input-bordered w-full bg-zinc-900 text-white border-zinc-600 focus:border-zinc-500 text-sm h-10"
-                {...register('pId', { required: 'Product ID is Required' })}
+                {...register('productId', { required: 'Product ID is Required' })}
               />
-              {errors.pId && <p className="text-[#ff2600] text-xs mt-1">{errors.pId.message}</p>}
+              {errors.productId && <p className="text-[#ff2600] text-xs mt-1">{errors.productId.message}</p>}
             </div>
 
             {/* Image Upload (File) */}

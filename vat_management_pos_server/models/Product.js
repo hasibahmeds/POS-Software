@@ -6,7 +6,7 @@ const Product = sequelize.define('Product', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  pId: {
+  productId: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true

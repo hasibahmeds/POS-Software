@@ -6,7 +6,7 @@ const Booking = sequelize.define('Booking', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  pId: {
+  productId: {
     type: DataTypes.STRING,
     allowNull: false
   },
@@ -24,7 +24,7 @@ const Booking = sequelize.define('Booking', {
     defaultValue: 1
   }
 }, {
-  tableName: 'bookings' /* Booking table refers to active items in cart/book list */
+  tableName: 'bookings'
 });
 
 module.exports = Booking;

@@ -30,7 +30,7 @@ const QRCodeScanner = () => {
     }
     const bookingData = {
       name: selectedProduct.name,
-      pId: selectedProduct.pId,
+      productId: selectedProduct.productId,
       price: selectedProduct.price,
       img: selectedProduct.img,
       bookQuantity: Number(quantity),

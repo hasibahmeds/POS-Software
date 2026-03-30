@@ -22,7 +22,7 @@ const AllProduct = ({
         />
       </th>
       <td className="bg-zinc-700">{product?.name}</td>
-      <td className="bg-zinc-700 font-mono">{product?.pId}</td>
+      <td className="bg-zinc-700 font-mono">{product?.productId}</td>
       <td className="bg-zinc-700 font-semibold">{product?.quantity}</td>
       <td className="bg-zinc-700">{product?.price} TK</td>
 

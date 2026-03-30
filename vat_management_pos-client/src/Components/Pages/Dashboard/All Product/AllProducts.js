@@ -138,7 +138,7 @@ const AllProducts = () => {
     setIsUpdating(true);
 
     const name = event.target.name.value;
-    const pId = event.target.pId.value;
+    const productId = event.target.productId.value;
     const price = event.target.price.value;
 
     const imageFile = event.target.imageFile.files[0];
@@ -169,7 +169,7 @@ const AllProducts = () => {
       }
 
       // Now update the product details in backend
-      const updatedData = { name, img: finalImageUrl, pId, price };
+      const updatedData = { name, img: finalImageUrl, productId, price };
 
       const serverRes = await fetch(`http://localhost:5000/product-update/${singleProduct?._id}`, {
         method: 'PUT',
@@ -353,8 +353,8 @@ const AllProducts = () => {
                     </label>
                     <input
                       type="text"
-                      name="pId"
-                      defaultValue={singleProduct?.pId}
+                      name="productId"
+                      defaultValue={singleProduct?.productId}
                       required
                       className="input input-bordered w-full bg-zinc-900 text-zinc-200 border-zinc-700 focus:border-zinc-500 h-11"
                     />

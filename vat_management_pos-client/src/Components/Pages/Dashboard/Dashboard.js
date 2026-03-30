@@ -73,13 +73,13 @@ const Dashboard = () => {
       icon: <RxUpdate className="text-2xl" />,
       isSignOut: false,
     },
-    {
-      id: 7,
-      name: "Back",
-      path: "https://en.wikipedia.org/wiki/Point_of_sale",
-      icon: <RiArrowGoBackLine className="text-2xl" />,
-      isSignOut: false,
-    },
+    // {
+    //   id: 7,
+    //   name: "Back",
+    //   path: "https://en.wikipedia.org/wiki/Point_of_sale",
+    //   icon: <RiArrowGoBackLine className="text-2xl" />,
+    //   isSignOut: false,
+    // },
     {
       id: 8,
       name: "Sign Out",
@@ -124,11 +124,13 @@ const Dashboard = () => {
           </button>
 
           <div className="flex items-center space-x-3">
-            <img
+
+            {/* <img
               className="h-10 w-10  object-cover flex-shrink-0"
               src={users[0]?.img || "https://i.ibb.co.com/ZPXrmqw/logo-1.png"}
               alt="Profile"
-            />
+            /> */}
+
             {/* <div className="hidden sm:block max-w-[120px]">
               <span className="font-semibold truncate block">
                 {user?.displayName || "Admin"}
@@ -218,11 +220,13 @@ const Dashboard = () => {
           {/* Profile Section with word wrapping */}
           <div className="p-6 border-b border-zinc-700">
             <div className="flex items-start space-x-3">
-              <img
+
+              {/* <img
                 className="h-12 w-13 object-cover flex-shrink-0 mt-3"
                 src={users[0]?.img || "https://i.ibb.co.com/ZPXrmqw/logo-1.png"}
                 alt="Profile"
-              />
+              /> */}
+
               <div className="min-w-0 flex-1">
                 <h3 className="font-bold text-lg break-words">
                   {user?.displayName || "Admin"}

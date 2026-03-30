@@ -8,7 +8,7 @@ const BuyProduct = ({ product, index, onDelete }) => {
   // Group duplicate products within this specific sale
   const aggregatedBookings = Object.values(
     product.bookings.reduce((acc, item) => {
-      const key = item.pId || item.name; 
+      const key = item.productId || item.name; 
       if (!acc[key]) {
         acc[key] = { ...item, bookQuantity: 0 };
       }
@@ -24,7 +24,8 @@ const BuyProduct = ({ product, index, onDelete }) => {
     <>
       <tr className="border-b border-zinc-700 hover:bg-zinc-700/50 transition-colors">
         <th className="bg-transparent text-zinc-500">{index}</th>
-        <td className="bg-transparent font-bold text-zinc-200">{product?.name || 'Walk-in Customer'}</td>
+        {/* <td className="bg-transparent font-bold text-zinc-200">{product?.name || 'Walk-in Customer'}</td> */}
+        <td className="bg-transparent font-bold text-zinc-200">{product?.customerName || 'Walk-in Customer'}</td>
         
         <td className="bg-transparent">
           <button 

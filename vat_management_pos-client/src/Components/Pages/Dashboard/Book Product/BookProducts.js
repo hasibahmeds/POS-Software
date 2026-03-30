@@ -362,7 +362,7 @@ const BookProducts = () => {
     if (proceed) {
       try {
         // 1. Get current Main Product Stock
-        const res = await fetch(`http://localhost:5000/allProducts/${product.pId}`);
+        const res = await fetch(`http://localhost:5000/allProducts/${product.productId}`);
         const mainProduct = await res.json();
         
         if (mainProduct) {

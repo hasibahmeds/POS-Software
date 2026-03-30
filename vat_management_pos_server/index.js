@@ -6,8 +6,11 @@ const sequelize = require('./config/db');
 const User = require('./models/User');
 const Product = require('./models/Product');
 const Booking = require('./models/Booking');
-const Buy = require('./models/Buy');
+const { Buy, BuyItem } = require('./models/Buy');
 const UpdateProduct = require('./models/UpdateProduct');
+
+// Load all model associations
+require('./models/associations');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -18,7 +21,8 @@ app.use(express.json());
 
 async function run() {
   try {
-    await sequelize.sync();
+    // Sync with alter to update existing tables
+    await sequelize.sync({ alter: true });
     // console.log("Database connected and synced");
 
     // // // // // // // // // // // // //
@@ -105,9 +109,9 @@ async function run() {
     app.put('/product-update/:id', async (req, res) => {
       try {
         const id = req.params.id;
-        const { name, img, pId, price } = req.body;
+        const { name, img, productId, price } = req.body;
         const result = await Product.update(
-          { name, img, pId, price },
+          { name, img, productId, price },
           { where: { id: id } }
         );
         res.send(result);
@@ -128,11 +132,11 @@ async function run() {
       }
     });
 
-    // // get product by pId
+    // // get product by productId
     app.get('/allProducts/:id', async (req, res) => {
       try {
-        const pId = req.params.id;
-        const result = await Product.findOne({ where: { pId: pId } });
+        const productId = req.params.id;
+        const result = await Product.findOne({ where: { productId: productId } });
         if (result) {
             res.send({ ...result.toJSON(), _id: result.id });
         } else {
@@ -157,7 +161,34 @@ async function run() {
     app.post('/updateProduct', async (req, res) => {
       try {
         const postResult = req.body;
-        const result = await UpdateProduct.create(postResult);
+        
+        // Handle both old format (singleProduct JSON) and new format (individual columns)
+        let updateData;
+        if (postResult.singleProduct) {
+          // Old format - extract from singleProduct JSON object
+          updateData = {
+            productId: postResult.singleProduct.productId,
+            name: postResult.singleProduct.name,
+            img: postResult.singleProduct.img,
+            price: postResult.singleProduct.price,
+            updateQuantity: postResult.updateQuantity,
+            date: postResult.date,
+            lastQuantityAdd: postResult.lastQuantityAdd
+          };
+        } else {
+          // New format - use columns directly
+          updateData = {
+            productId: postResult.productId,
+            name: postResult.name,
+            img: postResult.img,
+            price: postResult.price,
+            updateQuantity: postResult.updateQuantity,
+            date: postResult.date,
+            lastQuantityAdd: postResult.lastQuantityAdd
+          };
+        }
+        
+        const result = await UpdateProduct.create(updateData);
         res.send(result);
       } catch (error) {
         res.status(500).send({ error: error.message });
@@ -168,7 +199,19 @@ async function run() {
     app.get('/updateProduct', async (req, res) => {
       try {
         const result = await UpdateProduct.findAll();
-        const modifiedResult = result.map(u => ({ ...u.toJSON(), _id: u.id }));
+        // Convert individual columns to singleProduct format for backward compatibility
+        const modifiedResult = result.map(u => ({
+          _id: u.id,
+          singleProduct: {
+            productId: u.productId,
+            name: u.name,
+            img: u.img,
+            price: u.price
+          },
+          updateQuantity: u.updateQuantity,
+          date: u.date,
+          lastQuantityAdd: u.lastQuantityAdd
+        }));
         res.send(modifiedResult);
       } catch (error) {
         res.status(500).send({ error: error.message });
@@ -201,8 +244,8 @@ async function run() {
       try {
         const product = req.body;
 
-        // Check if the product already exists in the cart (using pId)
-        const exists = await Booking.findOne({ where: { pId: product.pId } });
+        // Check if the product already exists in the cart (using productId)
+        const exists = await Booking.findOne({ where: { productId: product.productId } });
 
         if (exists) {
           // If it exists, update the quantity (Add new quantity to old quantity)
@@ -210,7 +253,7 @@ async function run() {
 
           await Booking.update(
             { bookQuantity: newQuantity },
-            { where: { pId: product.pId } }
+            { where: { productId: product.productId } }
           );
           res.send({ acknowledged: true });
         } else {
@@ -262,8 +305,50 @@ async function run() {
         const postResult = req.body;
         postResult.customerName = postResult.name;
         
-        const result = await Buy.create(postResult);
-        res.send(result);
+        // Extract bookings array and create Buy record
+        const { bookings, ...buyData } = postResult;
+        
+        // Create the Buy record first
+        const buyRecord = await Buy.create(buyData);
+        
+        // If there are bookings, create BuyItem records for each
+        // Handle both array format and legacy single-item objects
+        let bookingsArray = [];
+        if (bookings && Array.isArray(bookings)) {
+          bookingsArray = bookings;
+        } else if (bookings && typeof bookings === 'object') {
+          // Legacy single-item format or empty object
+          bookingsArray = [bookings];
+        }
+        
+        try {
+          for (const item of bookingsArray) {
+            if (item && item.productId) {
+              await BuyItem.create({
+                buyId: buyRecord.id,
+                productId: item.productId,
+                name: item.name,
+                price: item.price,
+                img: item.img,
+                bookQuantity: item.bookQuantity || 1
+              });
+            }
+          }
+        } catch (itemError) {
+          // If buy_items table doesn't exist, just continue
+          console.log('BuyItems table may not exist yet:', itemError.message);
+        }
+        
+        // Fetch the complete record with items
+        try {
+          const result = await Buy.findByPk(buyRecord.id, {
+            include: [{ model: BuyItem, as: 'items' }]
+          });
+          res.send(result);
+        } catch (fetchError) {
+          // Return basic record if no items table
+          res.send(buyRecord);
+        }
       } catch (error) {
         res.status(500).send({ error: error.message });
       }
@@ -272,9 +357,40 @@ async function run() {
     // // get booking products
     app.get('/buys', async (req, res) => {
       try {
-        const result = await Buy.findAll();
-        const modifiedResult = result.map(b => ({ ...b.toJSON(), _id: b.id }));
-        res.send(modifiedResult);
+        let result;
+        try {
+          result = await Buy.findAll({
+            include: [{ model: BuyItem, as: 'items' }]
+          });
+          const modifiedResult = result.map(b => {
+            const json = b.toJSON();
+            // Convert items array to bookings format for backward compatibility
+            const items = json.items || [];
+            // Map items to the same format as the old bookings JSON
+            const bookings = items.map(item => ({
+              productId: item.productId,
+              name: item.name,
+              price: item.price,
+              img: item.img,
+              bookQuantity: item.bookQuantity
+            }));
+            return { 
+              ...json, 
+              _id: b.id,
+              bookings: bookings
+            };
+          });
+          res.send(modifiedResult);
+        } catch (includeError) {
+          // If buy_items table doesn't exist yet, return just buys data
+          result = await Buy.findAll();
+          const modifiedResult = result.map(b => ({
+            ...b.toJSON(),
+            _id: b.id,
+            bookings: []
+          }));
+          res.send(modifiedResult);
+        }
       } catch (error) {
         res.status(500).send({ error: error.message });
       }
@@ -309,9 +425,9 @@ async function run() {
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
-  res.send('Running Vat Management Pos Server');
+  res.send('Running Pos Server');
 });
 
 app.listen(port, () => {
-  console.log('Vat Management Pos Server is running ');
+  console.log('Pos Server is running ');
 });

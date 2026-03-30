@@ -2,10 +2,6 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
 const Buy = sequelize.define('Buy', {
-  bookings: {
-    type: DataTypes.JSON,
-    allowNull: false
-  },
   subTotal: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false
@@ -45,4 +41,49 @@ const Buy = sequelize.define('Buy', {
   tableName: 'buys'
 });
 
-module.exports = Buy;
+// Define BuyItem model for individual items in each sale
+const BuyItem = sequelize.define('BuyItem', {
+  buyId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'buys',
+      key: 'id'
+    }
+  },
+  productId: {
+    type: DataTypes.STRING(255),
+    allowNull: false
+  },
+  name: {
+    type: DataTypes.STRING(255),
+    allowNull: false
+  },
+  price: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false
+  },
+  img: {
+    type: DataTypes.STRING(512)
+  },
+  bookQuantity: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 1
+  }
+}, {
+  tableName: 'buy_items'
+});
+
+// Define relationships
+Buy.hasMany(BuyItem, { 
+  foreignKey: 'buyId', 
+  as: 'items',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+BuyItem.belongsTo(Buy, { 
+  foreignKey: 'buyId' 
+});
+
+module.exports = { Buy, BuyItem };
