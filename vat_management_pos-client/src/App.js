@@ -6,6 +6,7 @@ import "./App.css";
 import CreateAccount from "./Components/Login/CreateAccount";
 import Login from "./Components/Login/Login";
 import RequireAuth from "./Components/Login/RequireAUth";
+import ResetPassword from "./Components/Login/ResetPassword";
 import AddProduct from "./Components/Pages/Dashboard/Add Product/AddProduct";
 import AllProducts from "./Components/Pages/Dashboard/All Product/AllProducts";
 import Bookings from "./Components/Pages/Dashboard/Boooking/Bookings";
@@ -24,6 +25,7 @@ function App() {
       <Routes>
         <Route path="/createAccount" element={<CreateAccount />}></Route>
         <Route path="/login" element={<Login />}></Route>
+        <Route path="/resetPassword" element={<ResetPassword />}></Route>
         <Route path="/*" element={<NotFound />}></Route>
 
         {/* Dashboard Start */}
@@ -49,7 +51,18 @@ function App() {
         {/* Dashboard End */}
       </Routes>
       {/* <Footer /> */}
-      <ToastContainer />
+      <ToastContainer
+        // position="top-center"
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 }

@@ -23,8 +23,21 @@ const Dashboard = () => {
   useEffect(() => {
     if (authUser?.email) {
       fetch(`http://localhost:5000/user/${authUser?.email}`)
-        .then((res) => res.json())
-        .then((data) => setUsers(data));
+        .then((res) => {
+          if (!res.ok) {
+            // User not found is not an error, just set empty array
+            if (res.status === 404) {
+              return [];
+            }
+            throw new Error('Network response was not ok');
+          }
+          return res.json();
+        })
+        .then((data) => setUsers(data || []))
+        .catch((error) => {
+          console.error('Error fetching user:', error);
+          setUsers([]);
+        });
     }
   }, [authUser?.email]);
 

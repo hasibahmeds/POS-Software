@@ -11,19 +11,27 @@ const AllProducts = () => {
   const imageHostKey = '29c3381b54a28ccaac52647860043744'; // For file uploads
 
   // Fetch all products - remove [products] dependency to avoid infinite loop
-  const fetchProducts = () => {
+  const fetchProducts = (search = '') => {
     setLoading(true);
-    fetch('http://localhost:5000/allProduct')
+    const url = search.trim()
+      ? `http://localhost:5000/allProduct?search=${encodeURIComponent(search)}`
+      : 'http://localhost:5000/allProduct';
+    
+    fetch(url)
       .then(res => res.json())
       .then(data => {
         setProducts(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching products:', err);
         setLoading(false);
       });
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, []); // Only on mount
+    fetchProducts(searchQuery);
+  }, [searchQuery]); // Refetch when searchQuery changes
 
   const handleEdit = id => {
     fetch(`http://localhost:5000/product/${id}`)
@@ -257,21 +265,19 @@ const AllProducts = () => {
             </tr>
           </thead>
           <tbody>
-            {products
-              .filter(product => product?.name?.toLowerCase().includes(searchQuery.toLowerCase()))
-              .map((product, index) => (
-                <AllProduct
-                  key={product._id}
-                  product={product}
-                  index={index + 1}
-                  handleEdit={handleEdit}
-                  singleProduct={singleProduct}
-                  handleRestock={handleRestock}
-                  handleDecrease={handleDecrease}
-                  handleDelete={handleDelete}
-                  handleUpdateDetails={handleUpdateDetails}
-                />
-              ))}
+            {products.map((product, index) => (
+              <AllProduct
+                key={product._id}
+                product={product}
+                index={index + 1}
+                handleEdit={handleEdit}
+                singleProduct={singleProduct}
+                handleRestock={handleRestock}
+                handleDecrease={handleDecrease}
+                handleDelete={handleDelete}
+                handleUpdateDetails={handleUpdateDetails}
+              />
+            ))}
           </tbody>
         </table>
       </div>

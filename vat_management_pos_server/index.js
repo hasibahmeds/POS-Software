@@ -3,6 +3,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const sequelize = require('./config/db');
+const { Op } = require('sequelize');
 const User = require('./models/User');
 const Product = require('./models/Product');
 const Booking = require('./models/Booking');
@@ -52,6 +53,21 @@ async function run() {
       }
     });
 
+    // get user by email
+    app.get('/user/:email', async (req, res) => {
+      try {
+        const email = req.params.email;
+        const user = await User.findOne({ where: { email } });
+        if (user) {
+          res.send({ ...user.toJSON(), _id: user.id });
+        } else {
+          res.status(404).send({ error: 'User not found' });
+        }
+      } catch (error) {
+        res.status(500).send({ error: error.message });
+      }
+    });
+
     // // //                  product   //
     // // post product
     app.post('/allProduct', async (req, res) => {
@@ -64,10 +80,23 @@ async function run() {
       }
     });
 
-    // // get products
+    // // get products with optional search 
     app.get('/allProduct', async (req, res) => {
       try {
-        const products = await Product.findAll();
+        const { search } = req.query;
+        let where = {};
+        
+        if (search && search.trim() !== '') {
+          const searchTerm = `%${search.trim()}%`;
+          where = {
+            [Op.or]: [
+              { name: { [Op.like]: searchTerm } },
+              { productId: { [Op.like]: searchTerm } }
+            ]
+          };
+        }
+        
+        const products = await Product.findAll({ where });
         const modifiedProducts = products.map(p => ({ ...p.toJSON(), _id: p.id }));
         res.send(modifiedProducts);
       } catch (error) {
