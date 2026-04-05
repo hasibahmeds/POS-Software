@@ -5,33 +5,75 @@ import AllProduct from './AllProduct';
 const AllProducts = () => {
   const [products, setProducts] = useState([]);
   const [singleProduct, setSingleProduct] = useState({});
-  const [loading, setLoading] = useState(false); // Optional: for better UX
-  const [isUpdating, setIsUpdating] = useState(false); // New state to prevent double submits during Image Upload
-  const [searchQuery, setSearchQuery] = useState(''); // New state for search
-  const imageHostKey = '29c3381b54a28ccaac52647860043744'; // For file uploads
+  const [loading, setLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const imageHostKey = '29c3381b54a28ccaac52647860043744';
 
-  // Fetch all products - remove [products] dependency to avoid infinite loop
-  const fetchProducts = (search = '') => {
-    setLoading(true);
-    const url = search.trim()
-      ? `http://localhost:5000/allProduct?search=${encodeURIComponent(search)}`
-      : 'http://localhost:5000/allProduct';
+  // Pagination state
+  const [PRODUCTS_PER_PAGE, setProductsPerPage] = useState(100); // Can be changed
+  const [currentOffset, setCurrentOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  // Fetch products with pagination
+  const fetchProducts = (search = '', offset = 0, append = false) => {
+    if (!append) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
+
+    const url = `http://localhost:5000/allProduct?search=${encodeURIComponent(search)}&limit=${PRODUCTS_PER_PAGE}&offset=${offset}`;
     
     fetch(url)
       .then(res => res.json())
       .then(data => {
-        setProducts(data);
-        setLoading(false);
+        if (append) {
+          setProducts(prev => [...prev, ...data.products]);
+        } else {
+          setProducts(data.products);
+        }
+        setHasMore(data.hasMore);
+        setTotalProducts(data.total);
+        setCurrentOffset(offset);
+        
+        if (!append) {
+          setLoading(false);
+        } else {
+          setLoadingMore(false);
+        }
       })
       .catch(err => {
         console.error('Error fetching products:', err);
-        setLoading(false);
+        if (!append) {
+          setLoading(false);
+        } else {
+          setLoadingMore(false);
+        }
       });
   };
 
   useEffect(() => {
-    fetchProducts(searchQuery);
-  }, [searchQuery]); // Refetch when searchQuery changes
+    // Reset pagination when search query changes
+    setCurrentOffset(0);
+    setProducts([]);
+    fetchProducts(searchQuery, 0, false);
+  }, [searchQuery]);
+
+  // Load more products
+  const loadMoreProducts = () => {
+    const nextOffset = currentOffset + PRODUCTS_PER_PAGE;
+    fetchProducts(searchQuery, nextOffset, true);
+  };
+
+  // Reset pagination and reload
+  const resetAndReload = () => {
+    setCurrentOffset(0);
+    setProducts([]);
+    fetchProducts(searchQuery, 0, false);
+  };
 
   const handleEdit = id => {
     fetch(`http://localhost:5000/product/${id}`)
@@ -99,7 +141,7 @@ const AllProducts = () => {
         updateDateAndProduct(updateProduct);
         event.target.reset();
         toast.success('Quantity Updated!');
-        fetchProducts(); // <-- Refetch to update the table instantly
+        resetAndReload();
       })
       .catch(err => {
         console.error(err);
@@ -133,7 +175,7 @@ const AllProducts = () => {
       .then(() => {
         toast.success('Quantity Decreased Successfully');
         event.target.reset();
-        fetchProducts(); // <-- Refetch to update the table instantly
+        resetAndReload();
       })
       .catch(err => {
         console.error(err);
@@ -152,10 +194,9 @@ const AllProducts = () => {
     const imageFile = event.target.imageFile.files[0];
     const imgUrl = event.target.img.value;
 
-    let finalImageUrl = imgUrl || singleProduct?.img; // Fallback to existing or url string
+    let finalImageUrl = imgUrl || singleProduct?.img;
 
     try {
-      // If user selected an image file, upload it to imgBB first
       if (imageFile) {
         const formData = new FormData();
         formData.append('image', imageFile);
@@ -176,7 +217,6 @@ const AllProducts = () => {
         }
       }
 
-      // Now update the product details in backend
       const updatedData = { name, img: finalImageUrl, productId, price };
 
       const serverRes = await fetch(`http://localhost:5000/product-update/${singleProduct?._id}`, {
@@ -188,10 +228,9 @@ const AllProducts = () => {
       const result = await serverRes.json();
       if (result) {
         toast.success('Product Details Updated Successfully');
-        // Close modal
         const modal = document.getElementById('edit-details-modal');
         if (modal) modal.checked = false;
-        fetchProducts(); // Refresh data
+        resetAndReload();
       }
     } catch (err) {
       console.error(err);
@@ -208,7 +247,7 @@ const AllProducts = () => {
         .then(res => res.json())
         .then(() => {
           toast.success('Successfully Deleted');
-          fetchProducts(); // <-- Also refetch after delete
+          resetAndReload();
         });
     }
   };
@@ -247,40 +286,102 @@ const AllProducts = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto w-full">
-        {loading && <div className="text-center py-4">Loading...</div>}
-        <table className="table table-xs sm:table-sm md:table-md lg:table-lg w-full text-center text-white">
-          <thead>
-            <tr className="ext-xs sm:text-sm md:text-base">
-              <th className='bg-black'>#</th>
-              <th className='bg-black'>Image</th>
-              <th className='bg-black'>Name</th>
-              <th className='bg-black'>Product ID</th>
-              <th className='bg-black'>Quantity</th>
-              <th className='bg-black'>Price</th>
-              <th className='bg-black'>Edit</th>
-              <th className='bg-black'>Increase</th>
-              <th className='bg-black'>Decrease</th>
-              <th className='bg-black'>Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product, index) => (
-              <AllProduct
-                key={product._id}
-                product={product}
-                index={index + 1}
-                handleEdit={handleEdit}
-                singleProduct={singleProduct}
-                handleRestock={handleRestock}
-                handleDecrease={handleDecrease}
-                handleDelete={handleDelete}
-                handleUpdateDetails={handleUpdateDetails}
-              />
-            ))}
-          </tbody>
-        </table>
+      {/* Product Count Info */}
+      <div className="text-center mb-4">
+        <p className="text-sm text-zinc-400">
+          Showing <span className="text-info font-semibold">{products.length}</span> of <span className="text-info font-semibold">{totalProducts}</span> products
+        </p>
       </div>
+
+      <div className="overflow-x-auto w-full">
+        {loading && (
+          <div className="text-center py-8">
+            <span className="loading loading-spinner loading-lg text-info"></span>
+            <p className="text-zinc-400 mt-2">Loading products...</p>
+          </div>
+        )}
+        {!loading && products.length === 0 && (
+          <div className="text-center py-8 text-zinc-400">
+            <p>No products found</p>
+          </div>
+        )}
+        {!loading && products.length > 0 && (
+          <table className="table table-xs sm:table-sm md:table-md lg:table-lg w-full text-center text-white">
+            <thead>
+              <tr className="ext-xs sm:text-sm md:text-base">
+                <th className='bg-black'>#</th>
+                <th className='bg-black'>Image</th>
+                <th className='bg-black'>Name</th>
+                <th className='bg-black'>Product ID</th>
+                <th className='bg-black'>Quantity</th>
+                <th className='bg-black'>Price</th>
+                <th className='bg-black'>Edit</th>
+                <th className='bg-black'>Increase</th>
+                <th className='bg-black'>Decrease</th>
+                <th className='bg-black'>Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((product, index) => (
+                <AllProduct
+                  key={product._id}
+                  product={product}
+                  index={index + 1}
+                  handleEdit={handleEdit}
+                  singleProduct={singleProduct}
+                  handleRestock={handleRestock}
+                  handleDecrease={handleDecrease}
+                  handleDelete={handleDelete}
+                  handleUpdateDetails={handleUpdateDetails}
+                />
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* See More Button */}
+      {hasMore && (
+        <div className="flex flex-col items-center justify-center mt-6 mb-3">
+          <button
+            onClick={loadMoreProducts}
+            disabled={loadingMore}
+            className="btn btn-outline btn-info btn-md gap-2 px-6 group"
+          >
+            {loadingMore ? (
+              <>
+                <span className="loading loading-spinner loading-xs"></span>
+                Loading...
+              </>
+            ) : (
+              <>
+                <span className="text-base">See More</span>
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-4 w-4 group-hover:translate-y-0.5 transition-transform" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+              </>
+            )}
+          </button>
+          <p className="text-xs text-zinc-500 mt-1.5">
+            Load {PRODUCTS_PER_PAGE} more
+          </p>
+        </div>
+      )}
+
+      {/* No More Products Message */}
+      {!hasMore && products.length > 0 && (
+        <div className="text-center mt-8 mb-4">
+          <p className="text-sm text-zinc-500">
+            All {totalProducts} products loaded
+          </p>
+        </div>
+      )}
 
       {/* Edit Details Modal */}
       <input type="checkbox" id="edit-details-modal" className="modal-toggle" />

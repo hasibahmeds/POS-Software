@@ -80,10 +80,10 @@ async function run() {
       }
     });
 
-    // // get products with optional search 
+    // // get products with optional search and pagination
     app.get('/allProduct', async (req, res) => {
       try {
-        const { search } = req.query;
+        const { search, limit, offset } = req.query;
         let where = {};
         
         if (search && search.trim() !== '') {
@@ -96,9 +96,28 @@ async function run() {
           };
         }
         
-        const products = await Product.findAll({ where });
+        // Build query options
+        const queryOptions = { where };
+        
+        // Add pagination if limit and offset are provided
+        if (limit && parseInt(limit) > 0) {
+          queryOptions.limit = parseInt(limit);
+          if (offset && parseInt(offset) >= 0) {
+            queryOptions.offset = parseInt(offset);
+          }
+        }
+        
+        const products = await Product.findAll(queryOptions);
         const modifiedProducts = products.map(p => ({ ...p.toJSON(), _id: p.id }));
-        res.send(modifiedProducts);
+        
+        // Get total count for pagination
+        const totalCount = await Product.count({ where });
+        
+        res.send({
+          products: modifiedProducts,
+          total: totalCount,
+          hasMore: modifiedProducts.length === parseInt(limit) && (parseInt(offset || 0) + modifiedProducts.length) < totalCount
+        });
       } catch (error) {
         res.status(500).send({ error: error.message });
       }

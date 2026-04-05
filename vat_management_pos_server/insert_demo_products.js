@@ -21,7 +21,7 @@ async function insertDemoData() {
   };
 
   // Insert 600 demo products (starting from id=21, incrementing by 1)
-  for (let i = 0; i < 600; i++) {
+  for (let i = 0; i < 50000; i++) {
     const newId = 21 + i;
     const newName = `Coffee${i}`;
     const newProductId = String(5 + i);
@@ -36,7 +36,7 @@ async function insertDemoData() {
     console.log(`Inserted product ${newId}: ${newName}, ProductId: ${newProductId}, Quantity: ${newQuantity}, Price: ${newPrice}`);
   }
 
-  console.log('Successfully inserted 600 demo products!');
+  console.log('Successfully inserted 50000 demo products!');
 
   // Close connection
   await connection.end();

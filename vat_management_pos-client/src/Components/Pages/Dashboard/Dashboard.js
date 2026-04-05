@@ -227,9 +227,9 @@ const Dashboard = () => {
       </div>
 
       {/* Desktop Layout */}
-      <div className="flex min-h-screen pt-16 lg:pt-0">
+      <div className="min-h-screen pt-16 lg:pt-0">
         {/* Desktop Sidebar */}
-        <div className="hidden lg:flex lg:flex-col lg:w-64 bg-zinc-800 border-r border-zinc-700">
+        <div className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:top-0 lg:left-0 lg:h-full bg-zinc-800 border-r border-zinc-700">
           {/* Profile Section with word wrapping */}
           <div className="p-6 border-b border-zinc-700">
             <div className="flex items-start space-x-3">
@@ -286,7 +286,7 @@ const Dashboard = () => {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 overflow-auto">
+        <div className="lg:ml-64 overflow-auto">
           <div className="p-4 lg:p-6">
             <Outlet />
           </div>

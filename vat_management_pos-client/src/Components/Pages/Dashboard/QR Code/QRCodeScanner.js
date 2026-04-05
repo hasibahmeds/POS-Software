@@ -8,16 +8,26 @@ const QRCodeScanner = () => {
   const [search, setSearch] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [loading, setLoading] = useState(false);
 
+  // Fetch products with search from backend
   useEffect(() => {
-    fetch('http://localhost:5000/allProduct')
-      .then(res => res.json())
-      .then(data => setProducts(data));
-  }, []);
+    setLoading(true);
+    const url = search.trim()
+      ? `http://localhost:5000/allProduct?search=${encodeURIComponent(search)}&limit=100&offset=0`
+      : 'http://localhost:5000/allProduct?limit=100&offset=0';
 
-  const filteredProducts = products.filter(p =>
-    p.name.toLowerCase().includes(search.toLowerCase())
-  );
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        setProducts(data.products || []);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching products:', err);
+        setLoading(false);
+      });
+  }, [search]);
 
   const handleAddToCart = () => {
     if (!selectedProduct) {
@@ -82,8 +92,13 @@ const QRCodeScanner = () => {
           {/* Dropdown Results */}
           {search && !selectedProduct && (
             <div className="max-h-64 overflow-y-auto bg-white rounded-lg shadow-lg mb-6">
-              {filteredProducts.length > 0 ? (
-                filteredProducts.map((p) => (
+              {loading ? (
+                <div className="p-6 text-center text-gray-500">
+                  <span className="loading loading-spinner loading-sm"></span>
+                  <p className="mt-2">Searching...</p>
+                </div>
+              ) : products.length > 0 ? (
+                products.map((p) => (
                   <div
                     key={p._id}
                     onClick={() => {
